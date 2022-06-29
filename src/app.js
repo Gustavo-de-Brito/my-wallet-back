@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 import joi from "joi";
+import bcrypt from "bcrypt";
 
 dotenv.config();
 
@@ -41,6 +42,8 @@ app.post("/sign-up", async (req, res) => {
   if(error) {
     return res.sendStatus(422);
   }
+
+  const encryptPassword = bcrypt.hashSync(newUser.password, 10);
 
   res.sendStatus(201);
 });
