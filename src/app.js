@@ -19,7 +19,7 @@ mongoCLient.connect().then(() => {
   db = mongoCLient.db(process.env.MONGO_DB_NAME);
 });
 
-// clients route
+// sign-up route
 
 app.post("/sign-up", async (req, res) => {
   const newUser = req.body;
@@ -52,6 +52,20 @@ app.post("/sign-up", async (req, res) => {
   } catch(err) {
     res.sendStatus(500);
   }
+});
+
+// login route
+
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await db.collection("users").findOne({email: email});
+
+  if(!user || !(bcrypt.compareSync(password, user.password))) {
+    return res.status(401).send("Senha ou Email incorreto(a)");
+  }
+
+  res.sendStatus(200);
 });
 
 app.listen(process.env.PORT, () => {
