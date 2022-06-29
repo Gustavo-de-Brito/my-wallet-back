@@ -43,9 +43,15 @@ app.post("/sign-up", async (req, res) => {
     return res.sendStatus(422);
   }
 
-  const encryptPassword = bcrypt.hashSync(newUser.password, 10);
+  try {
+    const encryptedPassword = bcrypt.hashSync(newUser.password, 10);
 
-  res.sendStatus(201);
+    await db.collection("users").insertOne({...newUser, password: encryptedPassword});
+
+    res.sendStatus(201);
+  } catch(err) {
+    res.sendStatus(500);
+  }
 });
 
 app.listen(process.env.PORT, () => {
