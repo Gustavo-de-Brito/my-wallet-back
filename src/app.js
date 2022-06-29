@@ -20,7 +20,7 @@ mongoCLient.connect().then(() => {
 
 // clients route
 
-app.post("/clients", async (req, res) => {
+app.post("/sign-up", async (req, res) => {
   const newUser = req.body;
 
   // password must have at least: 1 number, 1 lowercase character,
