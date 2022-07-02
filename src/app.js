@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 import joi from "joi";
 import bcrypt from "bcrypt";
+import { v4 as uuid } from "uuid";
 
 dotenv.config();
 
@@ -59,13 +60,22 @@ app.post("/sign-up", async (req, res) => {
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await db.collection("users").findOne({email: email});
+  try {
+    const user = await db.collection("users").findOne({email: email});
+    // password will only be check if the user is found
+    const isRightpassword = user ? bcrypt.compareSync(password, user.password) : false;
 
-  if(!user || !(bcrypt.compareSync(password, user.password))) {
-    return res.status(401).send("Senha ou Email incorreto(a)");
+    if(!user || !isRightpassword) {
+      return res.status(401).send("Senha ou Email incorreto(a)");
+    }
+
+  } catch(err) {
+    res.sendStatus(500);
   }
 
-  res.sendStatus(200);
+  const token = uuid();
+
+  res.status(200).send({ token });
 });
 
 app.listen(process.env.PORT, () => {
