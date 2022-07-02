@@ -4,9 +4,18 @@ export async function getTransactions(req, res) {
   const userId = res.locals.userId;
 
   try {
-    const transactions = await db.collection("transactions").findOne({ userId: userId });
+    const userTransactions = await db.collection("transactions").findOne({ userId: userId });
 
-    res.status(200).send(transactions ? transactions : {});
+    let transactionsData = {};
+
+    if(userTransactions) {
+      transactionsData = { 
+        transactions: userTransactions.transactions,
+        totalTransactions: (userTransactions.totalTransactions).toFixed(2)
+      }; 
+    }
+
+    res.status(200).send(transactionsData);
   } catch{
     res.sendStatus(500);
   }
@@ -19,7 +28,14 @@ export async function addTransaction(req, res) {
   try{
     const userTransactions = await db.collection("transactions").findOne({ userId: objectId(userId) });
 
-    const transactions = [...userTransactions.transactions, {...transactionData, id: new Date().getTime()}];
+    const transactions = [
+      ...userTransactions.transactions,
+      {
+        ...transactionData,
+        value: transactionData.value.toFixed(2),
+        id: new Date().getTime()
+      }
+    ];
     let updatedTotal;
 
     if(transactionData.type === "entrace") {
