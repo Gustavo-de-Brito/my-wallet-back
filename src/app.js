@@ -1,7 +1,7 @@
 import express, { json } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import joi from "joi";
 import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
@@ -69,13 +69,14 @@ app.post("/login", async (req, res) => {
       return res.status(401).send("Senha ou Email incorreto(a)");
     }
 
+    const token = uuid();
+
+    await db.collection("sessions").insertOne({ userId:ObjectId(user._id), token });
+
+    res.status(200).send({ token });
   } catch(err) {
     res.sendStatus(500);
   }
-
-  const token = uuid();
-
-  res.status(200).send({ token });
 });
 
 app.listen(process.env.PORT, () => {
