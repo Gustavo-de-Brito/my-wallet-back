@@ -45,6 +45,12 @@ app.post("/sign-up", async (req, res) => {
   }
 
   try {
+    const registeredEmail = await db.collection("users").findOne({ email: newUser.email });
+
+    if(registeredEmail) {
+      return res.status(409).send("Email já cadastrado");
+    }
+
     const encryptedPassword = bcrypt.hashSync(newUser.password, 10);
 
     await db.collection("users").insertOne({...newUser, password: encryptedPassword});
