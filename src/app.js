@@ -71,7 +71,20 @@ app.post("/login", async (req, res) => {
 
     const token = uuid();
 
-    await db.collection("sessions").insertOne({ userId:ObjectId(user._id), token });
+    const tokenUser = await db.collection("sessions").findOne({ userId: ObjectId(user._id) });
+
+    if(tokenUser) {
+      await db.collection("sessions").updateOne(
+        {
+          userId: ObjectId(user._id)
+        },
+        {
+          $set: { token: token }
+        }
+      );
+    } else {
+      await db.collection("sessions").insertOne({ userId:ObjectId(user._id), token });
+    }
 
     res.status(200).send({ token });
   } catch(err) {
