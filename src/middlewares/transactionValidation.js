@@ -9,6 +9,7 @@ function transactionValidation(req, res, next) {
     {
       value: joi.number().required(),
       date: joi.string().pattern(dateRegex).required(),
+      description: joi.string().required(),
       type: joi.string().valid("entrace", "exit").required()
     }
   );

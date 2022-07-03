@@ -28,6 +28,7 @@ export async function signUp(req, res) {
 
 export async function login(req, res)  {
   const token = res.locals.token;
+  const userName = res.locals.user.name;
 
-  res.status(200).send({ token });
+  res.status(200).send({ token, userName });
 }
